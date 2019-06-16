@@ -1,0 +1,55 @@
+if [[ "$1" == "" ]]; then
+	echo "$0: argument requiered"
+else
+	echo -ne "adding $1"
+	if [ -d "$1/bin" ]; then
+		echo -ne " [/bin]"
+		export PATH="$1/bin":"$PATH"
+	fi
+	if [ -d "$1/include" ]; then
+		echo -ne " [/include]"
+		export CPPFLAGS="$CPPFLAGS -I$1/include"
+	fi
+	if [ -d "$1/info" ]; then
+		echo -ne " [/info]"
+		export INFOPATH="$1/info":"$INFOPATH"
+	fi
+	if [ -d "$1/lib" ]; then
+		echo -ne " [/lib]"
+		export LD_LIBRARY_PATH="$1/lib":"$LD_LIBRARY_PATH"
+		export LD_RUN_PATH="$1/lib":"$LD_RUN_PATH"
+		export LDFLAGS="$LDFLAGS -L$1/lib"
+	fi
+	if [ -d "$1/lib/x86_64-linux-gnu" ]; then
+		echo -ne " [/lib/x86_64-linux-gnu]"
+		export LD_LIBRARY_PATH="$1/lib/x86_64-linux-gnu":"$LD_LIBRARY_PATH"
+		export LD_RUN_PATH="$1/lib/x86_64-linux-gnu":"$LD_RUN_PATH"
+		export LDFLAGS="$LDFLAGS -L$1/lib/x86_64-linux-gnu"
+	fi
+	if [ -d "$1/lib64" ]; then
+		echo -ne " [/lib64]"
+		export LD_LIBRARY_PATH="$1/lib64":"$LD_LIBRARY_PATH"
+		export LD_RUN_PATH="$1/lib64":"$LD_RUN_PATH"
+		export LDFLAGS="$LDFLAGS -L$1/lib64"
+	fi
+	if [ -d "$1/lib32" ]; then
+		echo -ne " [/lib32]"
+		export LD_LIBRARY_PATH="$1/lib32":"$LD_LIBRARY_PATH"
+		export LD_RUN_PATH="$1/lib32":"$LD_RUN_PATH"
+		export LDFLAGS="$LDFLAGS -L$1/lib32"
+	fi
+	if [ -d "$1/lib/pkgconfig" ]; then
+		echo -ne " [/lib/pkgconfig]"
+		export PKG_CONFIG_PATH="$1/lib/pkgconfig":"$PKG_CONFIG_PATH"
+	fi
+	if [ -d "$1/man" ]; then
+		echo -ne " [/man]"
+		export MANPATH="$1/man":"$MANPATH"
+	fi
+	if [ -d "$1/share/man" ]; then
+		echo -ne " [/share/man]"
+		export MANPATH="$1/share/man":"$MANPATH"
+	fi
+	echo 
+fi
+
