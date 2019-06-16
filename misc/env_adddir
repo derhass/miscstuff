@@ -1,5 +1,6 @@
+# run with "source" / "."
 if [[ "$1" == "" ]]; then
-	echo "$0: argument requiered"
+	echo "$0: argument required"
 else
 	echo -ne "adding $1"
 	if [ -d "$1/bin" ]; then
