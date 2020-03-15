@@ -29,7 +29,7 @@ int main (int argc, char **argv)
 		return 2;
 	}
 	p=glCreateProgram();
-	cs(p,GL_VERTEX_SHADER,"#version 150 core\nout vec2 tc;void main(){tc=vec2( (gl_VertexID & 2)>>1, 1 - (gl_VertexID & 1)); gl_Position=vec4(tc*2.0-1.0,0,1);}");
+	cs(p,GL_VERTEX_SHADER,"#version 150 core\nout vec2 tc;void main(){tc=vec2( (gl_VertexID & 1)<<1, (gl_VertexID & 2)); gl_Position=vec4(tc*2.0-1.0,0,1);}");
 	cs(p,GL_FRAGMENT_SHADER,"#version 150 core\nuniform sampler2D tex;in vec2 tc;out vec4 color; void main() {color=0.1*texture(tex,tc);}");
 	glLinkProgram(p);
 	glUseProgram(p);
@@ -44,7 +44,7 @@ int main (int argc, char **argv)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, 2, 2, 0, GL_RGB, GL_FLOAT, img);
 	while (!glfwWindowShouldClose(win)) {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 3);
 		glfwSwapBuffers(win);
 		glfwPollEvents();
 	}
