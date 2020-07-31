@@ -1,6 +1,5 @@
-# run with "source" / "."
 if [[ "$1" == "" ]]; then
-	echo "$0: argument required"
+	echo "$0: argument requiered"
 else
 	echo -ne "adding $1"
 	if [ -d "$1/bin" ]; then
@@ -20,12 +19,6 @@ else
 		export LD_LIBRARY_PATH="$1/lib":"$LD_LIBRARY_PATH"
 		export LD_RUN_PATH="$1/lib":"$LD_RUN_PATH"
 		export LDFLAGS="$LDFLAGS -L$1/lib"
-	fi
-	if [ -d "$1/lib/x86_64-linux-gnu" ]; then
-		echo -ne " [/lib/x86_64-linux-gnu]"
-		export LD_LIBRARY_PATH="$1/lib/x86_64-linux-gnu":"$LD_LIBRARY_PATH"
-		export LD_RUN_PATH="$1/lib/x86_64-linux-gnu":"$LD_RUN_PATH"
-		export LDFLAGS="$LDFLAGS -L$1/lib/x86_64-linux-gnu"
 	fi
 	if [ -d "$1/lib64" ]; then
 		echo -ne " [/lib64]"
@@ -50,6 +43,14 @@ else
 	if [ -d "$1/share/man" ]; then
 		echo -ne " [/share/man]"
 		export MANPATH="$1/share/man":"$MANPATH"
+	fi
+	if [ -d "$1/lib/python2.7" ]; then
+		echo -ne " [/lib/python2.7]"
+		export PYTHONPATH="$1/lib/python2.7":"$PYTHONPATH"
+	fi
+	if [ -d "$1/lib/python2.7/dist-packages" ]; then
+		echo -ne " [/lib/python2.7/dist-packages]"
+		export PYTHONPATH="$1/lib/python2.7/dist-packages":"$PYTHONPATH"
 	fi
 	echo 
 fi
