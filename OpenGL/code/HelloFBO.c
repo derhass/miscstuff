@@ -1,5 +1,6 @@
 #include "GL/glew.h"
 #include <GLFW/glfw3.h>
+const int FBO_WIDTH = 256, FBO_HEIGHT = 256;
 GLuint cs(GLuint p, GLenum type, const char *src)
 {
 	GLuint sh=glCreateShader(type);
@@ -44,7 +45,7 @@ int main (int argc, char **argv)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 256, 256, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, FBO_WIDTH, FBO_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 	glBindTexture(GL_TEXTURE_2D, tex[1]);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -55,15 +56,15 @@ int main (int argc, char **argv)
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
 	glFramebufferTexture(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, tex[0], 0);
 	while (!glfwWindowShouldClose(win)) {
+		int w,h;
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
-		glViewport(0,0,256,256);
+		glViewport(0,0,FBO_WIDTH,FBO_HEIGHT);
 		glClear(GL_COLOR_BUFFER_BIT);
 		glBindTexture(GL_TEXTURE_2D,tex[1]);
 		glUseProgram(p);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-		int w,h;
-		glfwGetWindowSize(win,&w,&h);
+		glfwGetFramebufferSize(win,&w,&h);
 		glViewport(0,0,w,h);
 		glClear(GL_COLOR_BUFFER_BIT);
 		glBindTexture(GL_TEXTURE_2D,tex[0]);
