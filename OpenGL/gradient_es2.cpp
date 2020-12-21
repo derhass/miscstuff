@@ -11,16 +11,18 @@
 
 // Shader sources
 const GLchar* vertexSource =
+    "#version 100\n"
     "attribute vec4 position;    \n"
-    "varying vec3 pos;\n"
+    "varying vec4 pos;\n"
     "void main()                  \n"
     "{                            \n"
     "   gl_Position = vec4(position.xyz, 1.0);  \n"
-    "   pos = 0.5*position+vec3(0.5);  \n"
+    "   pos = 0.5*position+vec4(0.5);  \n"
     "}                            \n";
 const GLchar* fragmentSource =
+    "#version 100\n"
     "precision mediump float;\n"
-    "varying vec3 pos;\n"
+    "varying vec4 pos;\n"
     "void main()                                  \n"
     "{                                            \n"
     "  gl_FragColor = vec4 (pos.xxx, 1.0 );\n"
@@ -38,6 +40,7 @@ int main(int argc, char** argv)
         SDL_CreateWindow("test", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
             640, 480, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN));
 
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
     SDL_GL_SetSwapInterval(0);
@@ -46,9 +49,9 @@ int main(int argc, char** argv)
 
     auto glc = SDL_GL_CreateContext(wnd);
 
-    auto rdr = SDL_CreateRenderer(
-        wnd, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
+    SDL_GL_MakeCurrent(wnd, glc);
 
+    printf("%s\n%s\n%s\n", glGetString(GL_RENDERER),glGetString(GL_VENDOR),glGetString(GL_VERSION));
 
     // Create a Vertex Buffer Object and copy the vertex data to it
     GLuint vbo;
