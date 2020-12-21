@@ -12,6 +12,7 @@
 // Shader sources
 const GLchar* vertexSource =
     "#version 100\n"
+    "precision mediump float;\n"
     "attribute vec4 position;    \n"
     "varying vec4 pos;\n"
     "void main()                  \n"
