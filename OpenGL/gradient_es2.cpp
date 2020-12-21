@@ -4,24 +4,10 @@
 #include <exception>
 #include <functional>
 
-#ifdef __EMSCRIPTEN__
-
-#include <emscripten.h>
-#include <SDL.h>
-#include <SDL_image.h>
-#include <SDL_ttf.h>
-
-#define GL_GLEXT_PROTOTYPES 1
-#include <SDL_opengles2.h>
-
-#else
-
 #include <SDL2/SDL.h>
 
 #define GL_GLEXT_PROTOTYPES 1
 #include <SDL2/SDL_opengles2.h>
-
-#endif
 
 // Shader sources
 const GLchar* vertexSource =
@@ -63,10 +49,6 @@ int main(int argc, char** argv)
     auto rdr = SDL_CreateRenderer(
         wnd, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
 
-    // Create Vertex Array Object
-    GLuint vao;
-    glGenVertexArraysOES(1, &vao);
-    glBindVertexArrayOES(vao);
 
     // Create a Vertex Buffer Object and copy the vertex data to it
     GLuint vbo;
@@ -119,11 +101,7 @@ int main(int argc, char** argv)
         SDL_GL_SwapWindow(wnd);
     };
 
-#ifdef __EMSCRIPTEN__
-    emscripten_set_main_loop(main_loop, 0, true);
-#else
     while(true) main_loop();
-#endif
 
     return 0;
 }
