@@ -1,3 +1,8 @@
+# usage:
+# source env_adddir target_prefix [32|64]
+# if 32 or 64 is given, only the typical lib paths for these are considered
+# by default , both are considered
+
 if [[ "$1" == "" ]]; then
 	echo "$0: argument requiered"
 else
@@ -20,21 +25,57 @@ else
 		export LD_RUN_PATH="$1/lib":"$LD_RUN_PATH"
 		export LDFLAGS="$LDFLAGS -L$1/lib"
 	fi
-	if [ -d "$1/lib64" ]; then
-		echo -ne " [/lib64]"
-		export LD_LIBRARY_PATH="$1/lib64":"$LD_LIBRARY_PATH"
-		export LD_RUN_PATH="$1/lib64":"$LD_RUN_PATH"
-		export LDFLAGS="$LDFLAGS -L$1/lib64"
+	if [[ "$2" == "" ]] || [[ "$2" == "64" ]]; then
+		if [ -d "$1/lib/x86_64-linux-gnu" ]; then
+			echo -ne " [/lib/x86_64-linux-gnu]"
+			export LD_LIBRARY_PATH="$1/lib/x86_64-linux-gnu":"$LD_LIBRARY_PATH"
+			export LD_RUN_PATH="$1/lib/x86_64-linux-gnu":"$LD_RUN_PATH"
+			export LDFLAGS="$LDFLAGS -L$1/lib/x86_64-linux-gnu"
+		fi
+		if [ -d "$1/lib64" ]; then
+			echo -ne " [/lib64]"
+			export LD_LIBRARY_PATH="$1/lib64":"$LD_LIBRARY_PATH"
+			export LD_RUN_PATH="$1/lib64":"$LD_RUN_PATH"
+			export LDFLAGS="$LDFLAGS -L$1/lib64"
+		fi
 	fi
-	if [ -d "$1/lib32" ]; then
-		echo -ne " [/lib32]"
-		export LD_LIBRARY_PATH="$1/lib32":"$LD_LIBRARY_PATH"
-		export LD_RUN_PATH="$1/lib32":"$LD_RUN_PATH"
-		export LDFLAGS="$LDFLAGS -L$1/lib32"
+	if [[ "$2" == "" ]] || [[ "$2" == "32" ]]; then
+		if [ -d "$1/lib/i386-linux-gnu" ]; then
+			echo -ne " [/lib/i386-linux-gnu]"
+			export LD_LIBRARY_PATH="$1/lib/i386-linux-gnu":"$LD_LIBRARY_PATH"
+			export LD_RUN_PATH="$1/lib/i386-linux-gnu":"$LD_RUN_PATH"
+			export LDFLAGS="$LDFLAGS -L$1/lib/i386-linux-gnu"
+		fi
+		if [ -d "$1/lib32" ]; then
+			echo -ne " [/lib32]"
+			export LD_LIBRARY_PATH="$1/lib32":"$LD_LIBRARY_PATH"
+			export LD_RUN_PATH="$1/lib32":"$LD_RUN_PATH"
+			export LDFLAGS="$LDFLAGS -L$1/lib32"
+		fi
 	fi
 	if [ -d "$1/lib/pkgconfig" ]; then
 		echo -ne " [/lib/pkgconfig]"
 		export PKG_CONFIG_PATH="$1/lib/pkgconfig":"$PKG_CONFIG_PATH"
+	fi
+	if [[ "$2" == "" ]] || [[ "$2" == "64" ]]; then
+		if [ -d "$1/lib/x86_64-linux-gnu/pkgconfig" ]; then
+			echo -ne " [/lib/x86_64-linux-gnu/pkgconfig]"
+			export PKG_CONFIG_PATH="$1/lib/x86_64-linux-gnu/pkgconfig":"$PKG_CONFIG_PATH"
+		fi
+		if [ -d "$1/lib64/pkgconfig" ]; then
+			echo -ne " [/lib64/pkgconfig]"
+			export PKG_CONFIG_PATH="$1/lib64/pkgconfig":"$PKG_CONFIG_PATH"
+		fi
+	fi
+	if [[ "$2" == "" ]] || [[ "$2" == "32" ]]; then
+		if [ -d "$1/lib/i386-linux-gnu/pkgconfig" ]; then
+			echo -ne " [/lib/x86_64-linux-gnu/pkgconfig]"
+			export PKG_CONFIG_PATH="$1/lib/i386-linux-gnu/pkgconfig":"$PKG_CONFIG_PATH"
+		fi
+		if [ -d "$1/lib32/pkgconfig" ]; then
+			echo -ne " [/lib32/pkgconfig]"
+			export PKG_CONFIG_PATH="$1/lib32/pkgconfig":"$PKG_CONFIG_PATH"
+		fi
 	fi
 	if [ -d "$1/man" ]; then
 		echo -ne " [/man]"
@@ -43,14 +84,6 @@ else
 	if [ -d "$1/share/man" ]; then
 		echo -ne " [/share/man]"
 		export MANPATH="$1/share/man":"$MANPATH"
-	fi
-	if [ -d "$1/lib/python2.7" ]; then
-		echo -ne " [/lib/python2.7]"
-		export PYTHONPATH="$1/lib/python2.7":"$PYTHONPATH"
-	fi
-	if [ -d "$1/lib/python2.7/dist-packages" ]; then
-		echo -ne " [/lib/python2.7/dist-packages]"
-		export PYTHONPATH="$1/lib/python2.7/dist-packages":"$PYTHONPATH"
 	fi
 	echo 
 fi
