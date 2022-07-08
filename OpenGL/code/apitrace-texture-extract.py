@@ -3,7 +3,7 @@
 # evil hack
 # needs convert from image magick
 # format support is only RGBA 8Bit at the moment
-# usage: apitrace dump --blobs file.trace | apitrace-texture_extract.py
+# usage: apitrace dump --blobs [--grep='.*Image.*'] file.trace | apitrace-texture_extract.py
 
 # required libraries
 
@@ -66,29 +66,47 @@ class Settings:
 # apitrace dump processing                                                   #
 ##############################################################################
 
-def processImage(callId, call, args, blobs):
+def processImage(imgInfo):
+    Info('Processing ' + str(imgInfo))
+    try:
+        subprocess.run(['convert','-size',str(imgInfo['width'])+'x'+str(imgInfo['height']), '-depth', str(imgInfo['colorDepth']), imgInfo['format']+':blob_call'+str(imgInfo['callId'])+'.bin','blob_call'+str(imgInfo['callId'])+'.png'], check=True)
+    except subprocess.CalledProcessError as E:
+        Warn('Failed to process ' + str(imgInfo) + ': ' + str(E))
+
+def selectImage(callId, call, args, blobs):
     argsDict = {}
     for arg in args:
         if len(arg) > 1:
             argsDict[arg[0]]=arg[1]
-    width = 1
-    height = 1
-    level = 0
-    depth = 8
-    format = 'rgba'
+    imgInfo = {}
+    imgInfo['width'] = 1
+    imgInfo['height'] = 1
+    imgInfo['depth'] = 1
+    imgInfo['level'] = 0
+    imgInfo['colorDepth'] = 8
+    imgInfo['format'] = 'rgba'
+    imgInfo['callId'] = callId
 
     if 'width' in argsDict:
-        width = int(argsDict['width'])
+        imgInfo['width'] = int(argsDict['width'])
     if 'height' in argsDict:
-        height = int(argsDict['height'])
+        imgInfo['height'] = int(argsDict['height'])
     if 'level' in argsDict:
-        level = int(argsDict['level'])
-    Info('Found ' + str(callId) + ' ' + call + ' ' + str(width) + 'x'+ str(height)+ ' Level ' + str(level))
-    if level < Config.settings['minLevel'] or level > Config.settings['maxLevel']:
-        return
-    subprocess.run(['convert','-size',str(width)+'x'+str(height), '-depth', str(depth), format+':blob_call'+str(callId)+'.bin','blob_call'+str(callId)+'.png'])
+        imgInfo['level'] = int(argsDict['level'])
+    if 'format' in argsDict:
+        f = argsDict['format']
+        if f in FormatMap:
+            imgInfo['format'] = FormatMap[f]
+    if 'type' in argsDict:
+        t = argsDict['type']
+        if t in TypeMap:
+            imgInfo['colorDepth'] = TypeMap[t]
 
-
+    Debug('Found ' + call + ' ' + str(imgInfo))
+    if imgInfo['level'] < Config.settings['minLevel'] or imgInfo['level'] > Config.settings['maxLevel']:
+        return None
+    Info('Selected ' + str(imgInfo))
+    return imgInfo
 
 def processCall(callId, call, args):
     if re.search('Tex.*Image.*2D', call):
@@ -101,7 +119,8 @@ def processCall(callId, call, args):
                     blobs.append([argCnt, match.groups()[0]])
             argCnt = argCnt + 1
         if len(blobs) > 0:
-            processImage(callId, call, args, blobs)
+            return selectImage(callId, call, args, blobs)
+    return None
 
 
 def processLine(line):
@@ -114,14 +133,39 @@ def processLine(line):
         args = []
         for argfield in argfields:
             args.append(re.split('\s*=\s*', argfield))
-        processCall(callId, call, args)
+        return processCall(callId, call, args)
 
 ##############################################################################
 # entry point                                                                #
 ##############################################################################
 
 Config = Settings()
+imgInfos = []
+
+FormatMap = {
+    'GL_RGBA': 'rgba',
+    'GL_RGB': 'rgb',
+    'GL_BGR': 'bgr',
+    'GL_BGRA': 'bgra',
+    'GL_RED': 'gray',
+    'GL_BLUE': 'gray',
+    'GL_GREEN': 'gray',
+    'GL_ALPHA': 'gray',
+    'GL_LUMINANCE': 'gray'
+}
+
+TypeMap = {
+    'GL_UNSIGNED_BYTE': 8,
+    'GL_UNSIGNED_SHORT': 16,
+    'GL_UNSIGNED_INT': 32,
+    # TODO: signed and float types...
+}
 
 for line in fileinput.input():
-    processLine(line)
+    imgInfo = processLine(line)
+    if imgInfo:
+        imgInfos.append(imgInfo)
+Info('Selected ' +str(len(imgInfos)) + ' images')
+for imgInfo in imgInfos:
+    processImage(imgInfo)
 
