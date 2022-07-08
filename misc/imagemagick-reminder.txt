@@ -1,3 +1,3 @@
 Convert series of transparent pngs to GIF animation, crop to used size, add 2px transpaernt border
 
-convert -dispose 2 -delay 10 -loop 0 *.png -coalesce -trim +repage -layers TrimBounds -coalesce -bordercolor transparent -border 2 out.gif
+convert -dispose 2 -delay 10 -loop 0 *.png -coalesce -trim -layers TrimBounds -coalesce +repage -bordercolor transparent -border 2 out.gif
